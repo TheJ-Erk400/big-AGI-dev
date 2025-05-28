@@ -23,7 +23,16 @@ import { ModelVendorOpenAI } from './openai.vendor';
 // avoid repeating it all over
 const HELICONE_OPENAI_HOST = 'oai.hconeai.com';
 
-
+// Helper function to validate the OpenAI host
+function isValidHeliconeHost(oaiHost: string | undefined): boolean {
+  if (!oaiHost) return false;
+  try {
+    const parsedHost = new URL(oaiHost).host;
+    return parsedHost === HELICONE_OPENAI_HOST;
+  } catch {
+    return false; // Invalid URL
+  }
+}
 export function OpenAIServiceSetup(props: { serviceId: DModelsServiceId }) {
 
   // state
@@ -89,8 +98,8 @@ export function OpenAIServiceSetup(props: { serviceId: DModelsServiceId }) {
       onChange={text => updateSettings({ heliKey: text })}
     />}
 
-    {!!heliKey && <Alert variant='soft' color={oaiHost?.includes(HELICONE_OPENAI_HOST) ? 'success' : 'warning'}>
-      Advanced: You set the Helicone key. {!oaiHost?.includes(HELICONE_OPENAI_HOST)
+    {!!heliKey && <Alert variant='soft' color={isValidHeliconeHost(oaiHost) ? 'success' : 'warning'}>
+      Advanced: You set the Helicone key. {!isValidHeliconeHost(oaiHost)
       ? `But you also need to set the OpenAI Host to ${HELICONE_OPENAI_HOST} to use Helicone.`
       : 'OpenAI traffic will now be routed through Helicone.'}
     </Alert>}
