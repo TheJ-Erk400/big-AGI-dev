@@ -115,7 +115,9 @@ export function anthropicAccess(access: AnthropicAccessSchema, antModelIdForBeta
   // https://docs.helicone.ai/getting-started/integration-method/anthropic
   const heliKey = access.heliconeKey || env.HELICONE_API_KEY || false;
   if (heliKey) {
-    if (!anthropicHost.includes(DEFAULT_ANTHROPIC_HOST) && !anthropicHost.includes(DEFAULT_HELICONE_ANTHROPIC_HOST))
+    const parsedHost = new URL(anthropicHost).host;
+    const allowedHosts = [DEFAULT_ANTHROPIC_HOST, DEFAULT_HELICONE_ANTHROPIC_HOST];
+    if (!allowedHosts.includes(parsedHost))
       throw new Error(`The Helicone Anthropic Key has been provided, but the host is set to custom. Please fix it in the Models Setup page.`);
     anthropicHost = `https://${DEFAULT_HELICONE_ANTHROPIC_HOST}`;
   }
