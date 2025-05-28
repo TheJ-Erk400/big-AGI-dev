@@ -89,11 +89,20 @@ export function OpenAIServiceSetup(props: { serviceId: DModelsServiceId }) {
       onChange={text => updateSettings({ heliKey: text })}
     />}
 
-    {!!heliKey && <Alert variant='soft' color={oaiHost?.includes(HELICONE_OPENAI_HOST) ? 'success' : 'warning'}>
-      Advanced: You set the Helicone key. {!oaiHost?.includes(HELICONE_OPENAI_HOST)
-      ? `But you also need to set the OpenAI Host to ${HELICONE_OPENAI_HOST} to use Helicone.`
-      : 'OpenAI traffic will now be routed through Helicone.'}
-    </Alert>}
+    {!!heliKey && (() => {
+      let isHeliconeHost = false;
+      try {
+        const parsedUrl = new URL(oaiHost || '');
+        isHeliconeHost = parsedUrl.host === HELICONE_OPENAI_HOST;
+      } catch (e) {
+        isHeliconeHost = false;
+      }
+      return <Alert variant='soft' color={isHeliconeHost ? 'success' : 'warning'}>
+        Advanced: You set the Helicone key. {!isHeliconeHost
+        ? `But you also need to set the OpenAI Host to ${HELICONE_OPENAI_HOST} to use Helicone.`
+        : 'OpenAI traffic will now be routed through Helicone.'}
+      </Alert>;
+    })()}
 
     {advanced.on && <FormSwitchControl
       title='Moderation' on='Enabled' fullWidth
