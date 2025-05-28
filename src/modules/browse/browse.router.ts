@@ -365,7 +365,8 @@ function cleanHtml(html: string): string {
         const href = el.attr('href');
         if (href) {
           // -javascript: links
-          if (href.toLowerCase().startsWith('javascript:'))
+          const sanitizedHref = href.trim().toLowerCase();
+          if (sanitizedHref.startsWith('javascript:') || sanitizedHref.startsWith('data:') || sanitizedHref.startsWith('vbscript:'))
             el.removeAttr('href');
           // -tracking parameters
           else if (href.includes('?')) {
