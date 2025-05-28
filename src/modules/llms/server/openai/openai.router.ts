@@ -561,8 +561,15 @@ export function openAIAccess(access: OpenAIAccessSchema, modelRefId: string | nu
       const oaiOrg = access.oaiOrg || env.OPENAI_API_ORG_ID || '';
       let oaiHost = fixupHost(access.oaiHost || env.OPENAI_API_HOST || DEFAULT_OPENAI_HOST, apiPath);
       // warn if no key - only for default (non-overridden) hosts
-      if (!oaiKey && oaiHost.indexOf(DEFAULT_OPENAI_HOST) !== -1)
-        throw new Error('Missing OpenAI API Key. Add it on the UI or server side (your deployment).');
+      try {
+        const parsedHost = new URL(oaiHost).host;
+        const allowedHosts = [DEFAULT_OPENAI_HOST, `api.${DEFAULT_OPENAI_HOST}`];
+        if (!oaiKey && allowedHosts.includes(parsedHost)) {
+          throw new Error('Missing OpenAI API Key. Add it on the UI or server side (your deployment).');
+        }
+      } catch (e) {
+        throw new Error('Invalid OpenAI API Host. Please check the API Host field in the Models Setup page.');
+      }
 
       // [Helicone]
       // We don't change the host (as we do on Anthropic's), as we expect the user to have a custom host.
